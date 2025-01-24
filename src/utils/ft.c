@@ -1,46 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_substr.c                                        :+:      :+:    :+:   */
+/*   ft.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/04 19:43:00 by mazeghou          #+#    #+#             */
-/*   Updated: 2024/11/12 15:04:20 by mazeghou         ###   ########.fr       */
+/*   Created: 2025/01/24 20:34:40 by mazeghou          #+#    #+#             */
+/*   Updated: 2025/01/24 20:41:49 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../../include/philosophers.h"
 
-char	*ft_substr(const char *s, unsigned int start, size_t len)
+int	ft_atoi(const char *str)
 {
-	char	*result;
-	size_t	i;
-	size_t	j;
+	int	neg;
+	int	i;
+	int	num;
 
 	i = 0;
-	j = 0;
-	result = (char *)malloc(sizeof(char) * (len + 1));
-	if (!result)
-		return (NULL);
-	while (s[i])
+	neg = 1;
+	num = 0;
+	while (str[i] == ' ' || str[i] == '\n' || str[i] == '\t' || str[i] == '\v'
+		|| str[i] == '\f' || str[i] == '\r')
+		i++;
+	if (str[i] == '-' || str[i] == '+')
 	{
-		if (i >= start && j < len)
-		{
-			result[j] = s[i];
-			j++;
-		}
+		if (str[i] == '-')
+			neg *= -1;
 		i++;
 	}
-	result[j] = '\0';
-	return (result);
+	while (str[i] >= 48 && str[i] <= 57)
+	{
+		num = num * 10 + (str[i] - 48);
+		i++;
+	}
+	return (num * neg);
 }
-
-/*
-int	main(void)
-{
-	char * s = ft_substr("tripouille", 0, 42000);
-	printf("%s", s);
-	return (0);
-}
-*/

@@ -1,5 +1,7 @@
 {
 	"files.associations": {
-		"philosophers.h": "c"
+		"philosophers.h": "c",
+		"__locale": "c",
+		"unistd.h": "c"
 	}
 }
