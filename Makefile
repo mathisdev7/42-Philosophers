@@ -6,7 +6,7 @@
 #    By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 14:28:37 by mazeghou          #+#    #+#              #
-#    Updated: 2025/01/24 20:35:07 by mazeghou         ###   ########.fr        #
+#    Updated: 2025/01/27 01:17:44 by mazeghou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ UTILS_DIR = src/utils
 CC = cc
 CFLAGS =
 
-SRCS = $(SRC_DIR)/main.c $(UTILS_DIR)/main.c $(UTILS_DIR)/ft.c
+SRCS = $(SRC_DIR)/main.c $(UTILS_DIR)/main.c $(UTILS_DIR)/ft.c $(SRC_DIR)/threads.c $(SRC_DIR)/actions.c $(SRC_DIR)/life_actions.c $(SRC_DIR)/init_philo.c
 
 all: $(NAME)
 

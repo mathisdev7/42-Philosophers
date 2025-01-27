@@ -6,11 +6,34 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 20:16:23 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/24 20:16:47 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/27 00:49:07 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/philosophers.h"
+
+long long	get_current_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000LL + tv.tv_usec / 1000);
+}
+
+void	log_state(t_philosopher *philosopher, const char *state)
+{
+	long long	current_time;
+	long long	elapsed_time;
+
+	pthread_mutex_lock(&philosopher->mutex_print);
+	if (philosopher->simulation->is_running)
+	{
+		current_time = get_current_time();
+		elapsed_time = current_time - philosopher->simulation->start_time;
+		printf("%lldms %d %s\n", elapsed_time, philosopher->id + 1, state);
+	}
+	pthread_mutex_unlock(&philosopher->mutex_print);
+}
 
 int	ft_error(char *str)
 {
@@ -41,7 +64,7 @@ size_t	is_number(char *str)
 
 int	parse_args(char **argv)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	while (argv[i])
