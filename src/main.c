@@ -6,45 +6,80 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 19:53:27 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/27 01:17:09 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/29 01:22:19 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philosophers.h"
 
-int	init_philosophers(char **argv, t_simulation *simulation)
+void	free_philo_mutex(t_philo *philo, t_simu *simu)
 {
-	t_thread_info	info;
-	int				nb_philosophers;
+	if (simu && simu->mutex)
+		free(simu->mutex);
+	if (simu)
+		free(simu);
+	if (philo && philo->fork)
+		free(philo->fork);
+	if (philo)
+		free(philo);
+}
 
-	nb_philosophers = ft_atoi(argv[1]);
-	if (nb_philosophers <= 0)
-		return (ft_error("Invalid number of philosophers."));
-	if (!allocate_resources(nb_philosophers, &info.philosophers, &info.threads,
-			&simulation->forks))
-		return (0);
-	simulation->is_running = 1;
-	simulation->start_time = get_current_time();
-	simulation->forks = simulation->forks;
-	init_mutexes(simulation->forks, nb_philosophers, simulation);
-	info.nb_philosophers = nb_philosophers;
-	info.argv = argv;
-	info.simulation = simulation;
-	create_and_join_threads(&info);
-	cleanup_resources(info.philosophers, info.threads, simulation->forks,
-		nb_philosophers);
+int	is_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
 	return (1);
 }
 
-int	main(int argc, char **argv)
+int	check_args(char **argv)
 {
-	t_simulation	simulation;
+	int	i;
 
-	if (argc != 5 && argc != 6)
-		return (ft_error("You need to send at least 4 arguments."));
-	if (!parse_args(argv))
-		return (1);
-	if (!init_philosophers(argv, &simulation))
-		return (1);
-	return (0);
+	i = 1;
+	while (argv[i])
+	{
+		if (i == 1)
+		{
+			if (is_number(argv[i]) == 0 || ft_atoi(argv[i]) < 1)
+				return (0);
+		}
+		else if (i == 2 || i == 3 || i == 4)
+		{
+			if (is_number(argv[i]) == 0 || ft_atoi(argv[i]) < 1)
+				return (0);
+		}
+		else if (i == 5)
+		{
+			if (is_number(argv[i]) == 0 || ft_atoi(argv[i]) < 1)
+				return (0);
+		}
+		i++;
+	}
+	return (1);
+}
+
+int	main(int ac, char **av)
+{
+	t_philo	*philo;
+	t_simu	*simu;
+
+	if (ac < 5 || ac > 6 || check_args(av) != 1)
+	{
+		printf("Error: invalid arguments\nUsage: ./philo ");
+		printf("[nb_philo] [time_die] [time_eat] [time_sleep] ?[nb_meal]\n");
+		return (EXIT_FAILURE);
+	}
+	if (init(&philo, &simu, ac, av))
+		return (free_philo_mutex(philo, simu), EXIT_FAILURE);
+	if (start_simulation(philo, simu))
+		return (free_philo_mutex(philo, simu), EXIT_SUCCESS);
+	free_philo_mutex(philo, simu);
+	return (EXIT_SUCCESS);
 }

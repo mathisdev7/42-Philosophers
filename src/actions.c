@@ -5,65 +5,64 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/27 00:38:00 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/27 01:14:20 by mazeghou         ###   ########.fr       */
+/*   Created: 2025/01/29 01:23:05 by mazeghou          #+#    #+#             */
+/*   Updated: 2025/01/29 01:24:57 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philosophers.h"
 
-void	take_forks(t_philosopher *philosopher)
+void	philo_sleep(time_t ms)
 {
-	int	left_fork;
-	int	right_fork;
+	time_t	time;
 
-	left_fork = philosopher->id;
-	right_fork = (philosopher->id + 1) % philosopher->nb_philosophers;
-	if (philosopher->id % 2 == 0)
+	time = get_time();
+	while (get_time() - time < ms)
+		usleep(ms * 10);
+}
+
+int	grab_fork(char s, int a, int b)
+{
+	if (s == 'M')
 	{
-		pthread_mutex_lock(&philosopher->forks[left_fork]);
-		log_state(philosopher, "has taken a fork");
-		pthread_mutex_lock(&philosopher->forks[right_fork]);
+		if (a > b)
+			return (a);
+		return (b);
 	}
 	else
 	{
-		pthread_mutex_lock(&philosopher->forks[right_fork]);
-		log_state(philosopher, "has taken a fork");
-		pthread_mutex_lock(&philosopher->forks[left_fork]);
+		if (a < b)
+			return (a);
+		return (b);
 	}
 }
 
-void	release_forks(t_philosopher *philosopher)
+void	philo_finish_eating(t_philo *p)
 {
-	int	left_fork;
-	int	right_fork;
-
-	left_fork = philosopher->id;
-	right_fork = (philosopher->id + 1) % philosopher->nb_philosophers;
-	pthread_mutex_unlock(&philosopher->forks[left_fork]);
-	pthread_mutex_unlock(&philosopher->forks[right_fork]);
+	pthread_mutex_unlock(&p->fork[grab_fork('M', p->f[0], p->f[1])]);
+	pthread_mutex_unlock(&p->fork[grab_fork('m', p->f[0], p->f[1])]);
+	ft_print(p, SLEEPING);
+	philo_sleep(p->simu->time_slp);
 }
 
-void	wait_action(t_philosopher *philosopher, long long duration)
+int	philo_eating(t_philo *p)
 {
-	long long	start;
-	int			is_sim_running;
-
-	start = get_current_time();
-	while (get_current_time() - start < duration)
+	pthread_mutex_lock(&p->fork[grab_fork('m', p->f[0], p->f[1])]);
+	ft_print(p, FORK);
+	if (p->f[0] == p->f[1])
 	{
-		pthread_mutex_lock(&philosopher->simulation->mutex);
-		is_sim_running = philosopher->simulation->is_running;
-		pthread_mutex_unlock(&philosopher->simulation->mutex);
-		if (!is_sim_running)
-			break ;
-		usleep(100);
+		pthread_mutex_unlock(&p->fork[grab_fork('m', p->f[0], p->f[1])]);
+		return (1);
 	}
-}
-
-void	perform_actions(t_philosopher *philosopher)
-{
-	log_state(philosopher, "is thinking");
-	eat(philosopher);
-	sleep_action(philosopher);
+	pthread_mutex_lock(&p->fork[grab_fork('M', p->f[0], p->f[1])]);
+	ft_print(p, FORK);
+	ft_print(p, EATING);
+	pthread_mutex_lock(&p->simu->mutex[M_MEAL]);
+	p->last_meal = get_time();
+	p->time_ate++;
+	pthread_mutex_unlock(&p->simu->mutex[M_MEAL]);
+	if (philo_died(p, 0) || task_done(p->simu))
+		return (philo_finish_eating(p), 1);
+	philo_sleep(p->simu->time_eat);
+	return (philo_finish_eating(p), 0);
 }

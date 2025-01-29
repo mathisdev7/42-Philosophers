@@ -6,33 +6,36 @@
 #    By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 14:28:37 by mazeghou          #+#    #+#              #
-#    Updated: 2025/01/27 01:17:44 by mazeghou         ###   ########.fr        #
+#    Updated: 2025/01/29 01:27:33 by mazeghou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
-BIN_DIR = bin
-SRC_DIR = src
-UTILS_DIR = src/utils
-
 CC = cc
-CFLAGS =
+CFLAGS = -Wall -Wextra -Werror
 
-SRCS = $(SRC_DIR)/main.c $(UTILS_DIR)/main.c $(UTILS_DIR)/ft.c $(SRC_DIR)/threads.c $(SRC_DIR)/actions.c $(SRC_DIR)/life_actions.c $(SRC_DIR)/init_philo.c
+SRC_DIR = src
+SRCS = $(SRC_DIR)/main.c \
+	$(SRC_DIR)/utils/utils.c \
+	$(SRC_DIR)/simu.c \
+	$(SRC_DIR)/init.c \
+	$(SRC_DIR)/actions.c
+
+OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
-$(NAME): | $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$(NAME) $(SRCS)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
-$(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(BIN_DIR)/$(NAME)
+	rm -f $(OBJS)
 
 fclean: clean
-	rm -rf $(BIN_DIR)
+	rm -f $(NAME)
 
 re: fclean all
 
