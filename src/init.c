@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:03:00 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/29 01:03:00 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:54:17 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,13 @@ static int	init_philo(t_philo **philo, t_simu *simu)
 		(*philo)[i].id = i;
 		(*philo)[i].last_meal = simu->time_start;
 		(*philo)[i].time_ate = 0;
-		(*philo)[i].f[0] = i;
-		(*philo)[i].f[1] = (i + 1) % simu->nb_philo;
+		if (i % 2 == 0) {
+			(*philo)[i].f[0] = i;
+			(*philo)[i].f[1] = (i + 1) % simu->nb_philo;
+		} else {
+			(*philo)[i].f[0] = (i + 1) % simu->nb_philo;
+			(*philo)[i].f[1] = i;
+		}
 		(*philo)[i].fork = fork;
 		(*philo)[i].simu = simu;
 	}
@@ -61,8 +66,15 @@ static int	init_simulation(t_simu **simu, int ac, char **av)
 		(*simu)->must_eat = ft_atoi(av[5]);
 	(*simu)->time_start = get_time();
 	(*simu)->time_thk = 0;
-	if (((*simu)->nb_philo % 2 == 0) && (*simu)->time_eat > (*simu)->time_slp)
-		(*simu)->time_thk = (*simu)->time_eat - (*simu)->time_slp;
+	if ((*simu)->nb_philo % 2 == 1)
+	{
+		(*simu)->time_thk = (*simu)->time_eat;
+	}
+	else
+	{
+		int remaining = (*simu)->time_die - (*simu)->time_eat - (*simu)->time_slp;
+		(*simu)->time_thk = (remaining > 0) ? remaining / 2 : 0;
+	}
 	(*simu)->done = 0;
 	(*simu)->died = 0;
 	if (init_simulation_mutexes(simu))

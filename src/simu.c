@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:12:06 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/29 01:27:45 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/30 23:28:52 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,19 @@ int	task_done(t_simu *simu)
 {
 	int	i;
 	int	done;
-	int	time_ate;
 
 	if (simu->must_eat == -1)
 		return (0);
 	i = -1;
-	done = -1;
+	done = 0;
 	while (++i < simu->nb_philo)
 	{
 		pthread_mutex_lock(&simu->mutex[M_MEAL]);
-		time_ate = simu->philos[i].time_ate;
+		if (simu->philos[i].time_ate >= simu->must_eat)
+			done++;
 		pthread_mutex_unlock(&simu->mutex[M_MEAL]);
-		if (time_ate >= simu->must_eat)
-			if (++done == simu->nb_philo - 1)
-				return (1);
-		usleep(50);
 	}
-	return (0);
+	return (done == simu->nb_philo);
 }
 
 void	*philo_routine(void *data)
@@ -79,14 +75,14 @@ static void	routine_checker(t_philo *philo, t_simu *simu)
 	i = 0;
 	while (1)
 	{
-		pthread_mutex_lock(&simu->mutex[M_MEAL]);
-		last_meal = philo[i].last_meal;
-		pthread_mutex_unlock(&simu->mutex[M_MEAL]);
-		if (last_meal && task_done(simu))
+		if (task_done(simu))
 		{
 			philo_done(philo, 1);
 			break ;
 		}
+		pthread_mutex_lock(&simu->mutex[M_MEAL]);
+		last_meal = philo[i].last_meal;
+		pthread_mutex_unlock(&simu->mutex[M_MEAL]);
 		if (last_meal && get_time() - last_meal > simu->time_die)
 		{
 			philo_died(philo, 1);
@@ -94,9 +90,8 @@ static void	routine_checker(t_philo *philo, t_simu *simu)
 			break ;
 		}
 		i = (i + 1) % simu->nb_philo;
-		usleep(200);
+		usleep(1000);
 	}
-	return ;
 }
 
 int	start_simulation(t_philo *philo, t_simu *simu)

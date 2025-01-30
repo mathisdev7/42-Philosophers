@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 01:23:05 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/29 01:24:57 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/30 22:28:46 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,17 @@
 
 void	philo_sleep(time_t ms)
 {
-	time_t	time;
+	time_t	start;
+	time_t	elapsed;
 
-	time = get_time();
-	while (get_time() - time < ms)
-		usleep(ms * 10);
+	start = get_time();
+	while (1)
+	{
+		elapsed = get_time() - start;
+		if (elapsed >= ms)
+			break ;
+		usleep((ms - elapsed) * 1000);
+	}
 }
 
 int	grab_fork(char s, int a, int b)
