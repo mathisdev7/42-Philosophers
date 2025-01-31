@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 01:23:05 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/30 22:28:46 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:02:11 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ void	philo_finish_eating(t_philo *p)
 
 int	philo_eating(t_philo *p)
 {
+	time_t	eat_start;
+
 	pthread_mutex_lock(&p->fork[grab_fork('m', p->f[0], p->f[1])]);
 	ft_print(p, FORK);
 	if (p->f[0] == p->f[1])
@@ -67,8 +69,12 @@ int	philo_eating(t_philo *p)
 	p->last_meal = get_time();
 	p->time_ate++;
 	pthread_mutex_unlock(&p->simu->mutex[M_MEAL]);
-	if (philo_died(p, 0) || task_done(p->simu))
-		return (philo_finish_eating(p), 1);
-	philo_sleep(p->simu->time_eat);
+	eat_start = get_time();
+	while (get_time() - eat_start < p->simu->time_eat)
+	{
+		if (philo_died(p, 0) || task_done(p->simu))
+			return (philo_finish_eating(p), 1);
+		usleep(1000);
+	}
 	return (philo_finish_eating(p), 0);
 }

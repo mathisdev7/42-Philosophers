@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:12:06 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/30 23:28:52 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:02:19 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@ void	*philo_routine(void *data)
 	{
 		ft_print(philo, THINKING);
 		philo_sleep(philo->simu->time_eat);
+		pthread_mutex_lock(&philo->simu->mutex[M_MEAL]);
+		philo->last_meal = get_time();
+		pthread_mutex_unlock(&philo->simu->mutex[M_MEAL]);
 	}
 	while (1)
 	{
@@ -90,7 +93,7 @@ static void	routine_checker(t_philo *philo, t_simu *simu)
 			break ;
 		}
 		i = (i + 1) % simu->nb_philo;
-		usleep(1000);
+		usleep(500);
 	}
 }
 

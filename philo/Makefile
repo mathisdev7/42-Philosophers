@@ -6,7 +6,7 @@
 #    By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/23 14:28:37 by mazeghou          #+#    #+#              #
-#    Updated: 2025/01/29 01:27:33 by mazeghou         ###   ########.fr        #
+#    Updated: 2025/01/31 16:05:04 by mazeghou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ SRCS = $(SRC_DIR)/main.c \
 	$(SRC_DIR)/utils/utils.c \
 	$(SRC_DIR)/simu.c \
 	$(SRC_DIR)/init.c \
-	$(SRC_DIR)/actions.c
+	$(SRC_DIR)/actions.c \
+	$(SRC_DIR)/init2.c
 
 OBJS = $(SRCS:.c=.o)
 

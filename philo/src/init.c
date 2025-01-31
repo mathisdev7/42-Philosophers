@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 17:03:00 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/30 22:54:17 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:04:44 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,21 @@ static int	init_philo(t_philo **philo, t_simu *simu)
 	pthread_mutex_t	*fork;
 	int				i;
 
-	fork = malloc(sizeof(pthread_mutex_t) * ((size_t)simu->nb_philo));
-	if (fork == NULL)
+	if (init_forks(&fork, simu->nb_philo))
 		return (1);
-	i = 0;
-	while (i < simu->nb_philo)
-		pthread_mutex_init(&fork[i++], NULL);
 	i = -1;
 	while (++i < simu->nb_philo)
 	{
 		(*philo)[i].id = i;
 		(*philo)[i].last_meal = simu->time_start;
 		(*philo)[i].time_ate = 0;
-		if (i % 2 == 0) {
+		if (i % 2 == 0)
+		{
 			(*philo)[i].f[0] = i;
 			(*philo)[i].f[1] = (i + 1) % simu->nb_philo;
-		} else {
+		}
+		else
+		{
 			(*philo)[i].f[0] = (i + 1) % simu->nb_philo;
 			(*philo)[i].f[1] = i;
 		}
@@ -55,6 +54,32 @@ static int	init_simulation_mutexes(t_simu **simu)
 	return (0);
 }
 
+static int	init_simulation_state(t_simu **simu)
+{
+	long	remaining;
+
+	(*simu)->time_start = get_time();
+	(*simu)->time_thk = 0;
+	if ((*simu)->nb_philo % 2 == 1)
+	{
+		(*simu)->time_thk = (*simu)->time_eat;
+	}
+	else
+	{
+		remaining = (*simu)->time_die - (*simu)->time_eat - (*simu)->time_slp
+			- 5;
+		if (remaining > 10)
+			(*simu)->time_thk = (remaining - 10) / 2;
+		else if (remaining > 0)
+			(*simu)->time_thk = 2;
+		else
+			(*simu)->time_thk = 0;
+	}
+	(*simu)->done = 0;
+	(*simu)->died = 0;
+	return (0);
+}
+
 static int	init_simulation(t_simu **simu, int ac, char **av)
 {
 	(*simu)->nb_philo = ft_atoi(av[1]);
@@ -64,19 +89,8 @@ static int	init_simulation(t_simu **simu, int ac, char **av)
 	(*simu)->must_eat = -1;
 	if (ac == 6)
 		(*simu)->must_eat = ft_atoi(av[5]);
-	(*simu)->time_start = get_time();
-	(*simu)->time_thk = 0;
-	if ((*simu)->nb_philo % 2 == 1)
-	{
-		(*simu)->time_thk = (*simu)->time_eat;
-	}
-	else
-	{
-		int remaining = (*simu)->time_die - (*simu)->time_eat - (*simu)->time_slp;
-		(*simu)->time_thk = (remaining > 0) ? remaining / 2 : 0;
-	}
-	(*simu)->done = 0;
-	(*simu)->died = 0;
+	if (init_simulation_state(simu))
+		return (1);
 	if (init_simulation_mutexes(simu))
 		return (1);
 	return (0);

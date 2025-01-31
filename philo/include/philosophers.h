@@ -6,7 +6,7 @@
 /*   By: mazeghou <mazeghou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 14:21:38 by mazeghou          #+#    #+#             */
-/*   Updated: 2025/01/30 21:57:15 by mazeghou         ###   ########.fr       */
+/*   Updated: 2025/01/31 16:05:25 by mazeghou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,6 @@ int					philo_eating(t_philo *p);
 void				destroy_all_mutexes(t_philo *philo, t_simu *simu);
 int					philo_died(t_philo *philo, int nb);
 int					task_done(t_simu *simu);
+int					init_forks(pthread_mutex_t **fork, int nb_philo);
 
 #endif
